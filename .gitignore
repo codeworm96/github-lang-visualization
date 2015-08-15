@@ -1,4 +1,5 @@
 .directory
+/config.json
 *.swp
 /data/*
 /vendor/bundle/*

@@ -2,6 +2,7 @@
 
 require 'open-uri'
 require 'json'
+require 'octokit'
 
 def fetch_pypl
   puts "fetching PYPL data"
@@ -16,6 +17,38 @@ def fetch_pypl
   puts "data saved to data/pypl.js"
 end
 
+def repo_count(client, q)
+  res = client.search_repositories q, :per_page => 1
+  res[:total_count]
+end
+
+def fetch_github(client, date, lang)
+  res = []
+  res << ["Date"] + lang
+  (1...date.size).each do |id|
+    puts "fetching #{date[id]}..."
+    query = "pushed:>#{date[id - 1]} pushed:<=#{date[id]}"
+    total = repo_count(client, query)
+    row = [date[id]]
+    lang.each do |l|
+      puts ">>>>language: #{l}"
+      cnt = repo_count(client, query + " language:#{l}")
+      row << cnt.to_f / total
+    end
+    res << row
+  end
+  res
+end
+
+def save_to_file(res, name)
+  File.open(name, "w") do |f|
+    f.puts(JSON.generate(res))
+  end
+end
+
 fetch_pypl
 buf = File.read('config.json')
 config = JSON.parse(buf)
+
+client = Octokit::Client.new(:access_token => config["token"])
+save_to_file(fetch_github(client, config["date"], config["language"]), "data/github.json")
