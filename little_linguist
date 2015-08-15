@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby 
 
 require 'open-uri'
+require 'json'
 
 def fetch_pypl
   puts "fetching PYPL data"
@@ -16,3 +17,5 @@ def fetch_pypl
 end
 
 fetch_pypl
+buf = File.read('config.json')
+config = JSON.parse(buf)

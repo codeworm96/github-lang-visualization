@@ -1,3 +1,5 @@
 .directory
 *.swp
 /data/*
+/vendor/bundle/*
+Gemfile.lock
