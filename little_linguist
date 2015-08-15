@@ -1,2 +1,18 @@
 #!/usr/bin/env ruby 
-puts "hello, world"
+
+require 'open-uri'
+
+def fetch_pypl
+  puts "fetching PYPL data"
+  res = [];
+  open("http://pypl.github.io/PYPL/All.js") { |f|
+    res = f.readlines
+  }
+  res = res.map(&:chomp)
+  File.open("data/pypl.js", "w") do |f|
+    res.each { |line| f.puts line }
+  end
+  puts "data saved to data/pypl.js"
+end
+
+fetch_pypl
