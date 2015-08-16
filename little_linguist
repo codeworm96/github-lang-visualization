@@ -11,10 +11,10 @@ def fetch_pypl
     res = f.readlines
   }
   res = res.map(&:chomp)
-  File.open("data/pypl.js", "w") do |f|
+  File.open("report/data/pypl.js", "w") do |f|
     res.each { |line| f.puts line }
   end
-  puts "data saved to data/pypl.js"
+  puts "data saved to report/data/pypl.js"
 end
 
 def log(s)
@@ -71,10 +71,7 @@ buf = File.read('config.json')
 config = JSON.parse(buf)
 
 client = Octokit::Client.new(:access_token => config["token"])
-#config["stars"].each do |star|
-#  save_to_file(fetch_github(client, config["date"], config["language"], star), "data/star#{star}.json")
-#end
-
-config["date"].each do |d|
-  puts d, repo_count(client, "created:<" + d)
+config["stars"].each do |star|
+  save_to_file(fetch_github(client, config["date"], config["language"], star), "report/data/star#{star}.json")
 end
+
