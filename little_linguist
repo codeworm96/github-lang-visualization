@@ -17,27 +17,47 @@ def fetch_pypl
   puts "data saved to data/pypl.js"
 end
 
+def log(s)
+  File.open('log','a') do |f|
+    f.puts s
+  end
+end
+
 def repo_count(client, q)
-  res = client.search_repositories q, :per_page => 1
+  begin
+    res = client.search_repositories q, :per_page => 1
+  rescue Octokit::Error
+    puts "too fast"
+    sleep 60
+    retry
+  end
+  if res[:incomplete_results]
+    log('failed ' + q)
+  end
   res[:total_count]
 end
 
-def fetch_github(client, date, lang)
+def fetch_github(client, date, lang, star = 0)
   res = []
-  res << ["Date"] + lang
-  (1...date.size).each do |id|
-    puts "fetching #{date[id]}..."
-    query = "pushed:>#{date[id - 1]} pushed:<=#{date[id]}"
-    total = repo_count(client, query)
-    row = [date[id]]
-    lang.each do |l|
-      puts ">>>>language: #{l}"
+  res << ["Date"] + date[1..-1]
+
+  lang.each do |l|
+    puts ">>>>language: #{l}"
+    row = []
+    date.each do |d|
+      puts "fetching #{d}..."
+      query = "created:<#{d}" 
+      query += " stars:>=#{star}" if star > 0
       cnt = repo_count(client, query + " language:#{l}")
-      row << cnt.to_f / total
+      row << cnt
     end
+    (1...row.size).each do |id|
+      row[id] = row[id] - row[id - 1]
+    end
+    row[0] = l
     res << row
   end
-  res
+  res.first.zip(*res.drop(1))
 end
 
 def save_to_file(res, name)
@@ -51,4 +71,10 @@ buf = File.read('config.json')
 config = JSON.parse(buf)
 
 client = Octokit::Client.new(:access_token => config["token"])
-save_to_file(fetch_github(client, config["date"], config["language"]), "data/github.json")
+#config["stars"].each do |star|
+#  save_to_file(fetch_github(client, config["date"], config["language"], star), "data/star#{star}.json")
+#end
+
+config["date"].each do |d|
+  puts d, repo_count(client, "created:<" + d)
+end
