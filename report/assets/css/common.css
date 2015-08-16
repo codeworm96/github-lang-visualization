@@ -1,0 +1,27 @@
+#legend li {
+  display:inline-block;
+  margin: 5px;
+}
+
+#time-line li {
+  display:inline-block;
+  padding: 2px;
+  font-size: 13px;
+}
+
+.language-color {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.pie-chart {
+  display: inline-block;
+}
+
+h2.title {
+  width: 100px;
+  margin: 0 auto;
+  font-size: 16px;
+}

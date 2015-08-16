@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Github language distribution</title>
+    <meta charset="utf-8">
+    <style type="text/css">
+    </style>
+    <link rel="stylesheet" type="text/css" href="assets/css/common.css">
+  </head>
+  <body>
+    <h1>语言分布与star数关系</h1>
+    <ul id="time-line"></ul>
+    <div class="pie-chart" id="star0"><h2 class="title">stars >= 0</h2></div>
+    <div class="pie-chart" id="star10"><h2 class="title">stars >= 10</h2></div>
+    <div class="pie-chart" id="star100"><h2 class="title">stars >= 100</h2></div>
+    <div class="pie-chart" id="star1000"><h2 class="title">stars >= 1000</h2></div>
+    <ul id="legend"></ul>
+    <p>在时间轴上滑动以观察随时间的变化，点击扇形以查看详细信息。</p>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/color.js"></script>
+    <script src="data/star0.js"></script>
+    <script src="data/star10.js"></script>
+    <script src="data/star100.js"></script>
+    <script src="data/star1000.js"></script>
+    <script src="assets/js/pie.js"></script>
+    <script type="text/javascript">
+      
+      var languages = star0[0].slice(1);
+      var dates = [];
+      for (var i = 1; i < star0.length; ++i){
+        dates.push(star0[i][0]);
+      }
+      var charts = [];
+      github_data_convert(star0);
+      charts.push(new Pie(d3.select('#star0'), star0, 300, 300));
+      github_data_convert(star10);
+      charts.push(new Pie(d3.select('#star10'), star10, 300, 300));
+      github_data_convert(star100);
+      charts.push(new Pie(d3.select('#star100'), star100, 300, 300));
+      github_data_convert(star1000);
+      charts.push(new Pie(d3.select('#star1000'), star1000, 300, 300));
+      
+      create_timeline(d3.select('#time-line'), dates, charts);
+
+      labels = d3.select('#legend')
+        .selectAll('li')
+        .data(languages)
+        .enter()
+        .append('li')
+
+      labels.append('span')
+        .attr('class', 'language-color')
+        .style('background-color', function (d) { return color(d); });
+      labels.append('span')
+        .text(function (d) { return d; });
+
+    </script>
+  </body>
+<html>
