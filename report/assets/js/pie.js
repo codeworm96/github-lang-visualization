@@ -43,8 +43,16 @@ function Pie(cur, table, width, height) {
     .attr('transform', function (d) { return 'translate(' + arc.centroid(d) + ')'; })
     .style('text-anchor', 'middle');
   
-  g.on('click', function (d) {
-    alert(d.data.language + ': ' + d.data.share * 100 + '%');
+  g.on('mousemove', function (d) {
+    d3.select('.tooltip')
+      .text(d.data.language + ': ' + (d.data.share * 100).toFixed(2) + '%')
+      .style('left', (d3.event.pageX + 15) + 'px')
+      .style('top', (d3.event.pageY + 15) + 'px')
+      .style('display', 'block');
+  })
+  .on('mouseleave', function (d) {
+    d3.select('.tooltip')
+      .style('display', 'none');
   });
 
   this.render = function (date) {
@@ -65,26 +73,30 @@ function Pie(cur, table, width, height) {
 }
 
 function create_timeline(node, dates, charts) {
+  var focus = function (d) {
+    items.each(function (data) {
+      if (data === d){
+        d3.select(this)
+          .style('background-color', 'steelblue');
+      }else{
+        d3.select(this)
+          .style('background-color', 'grey');
+      }
+    });
+
+    charts.forEach(function(chart) {
+      chart.render(d);
+    });
+  };
+
   var items = node.selectAll('li')
     .data(dates)
     .enter()
     .append('li')
     .text(function (d) { return d.substr(0, 7); })
-    .on('mouseover', function (d) {
-      items.each(function (data) {
-        if (data === d){
-          d3.select(this)
-            .style('background-color', 'steelblue');
-        }else{
-          d3.select(this)
-            .style('background-color', 'grey');
-        }
-      });
+    .on('mouseover', focus);
 
-      charts.forEach(function(chart) {
-        chart.render(d);
-      });
-    });
+  focus(dates[dates.length - 1]);
 }
 
 

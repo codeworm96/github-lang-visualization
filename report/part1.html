@@ -67,12 +67,20 @@
             }else{
               return 'grey';
             }
+          })
+          .style('opacity', function(d) {
+            if (d.name == name) {
+              return 1;
+            }else{
+              return 0.6;
+            }
           });
       }
 
       function recover(){
         d3.selectAll('.lang path')
-          .style('stroke', function(d) { return color(d.name); });
+          .style('stroke', function(d) { return color(d.name); })
+          .style('opacity', 1);
       }
 
 

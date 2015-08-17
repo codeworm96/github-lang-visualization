@@ -9,13 +9,14 @@
   </head>
   <body>
     <h1>语言分布与star数关系</h1>
-    <ul id="time-line"></ul>
+    <ol id="time-line"></ol>
+    <div class="tooltip"></div>
     <div class="pie-chart" id="star0"><h2 class="title">stars >= 0</h2></div>
     <div class="pie-chart" id="star10"><h2 class="title">stars >= 10</h2></div>
     <div class="pie-chart" id="star100"><h2 class="title">stars >= 100</h2></div>
     <div class="pie-chart" id="star1000"><h2 class="title">stars >= 1000</h2></div>
     <ul id="legend"></ul>
-    <p>在时间轴上滑动以观察随时间的变化，点击扇形以查看详细信息。</p>
+    <p>在时间轴上滑动以观察随时间的变化，悬停于扇形上以查看详细信息。</p>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
     <script src="assets/js/util.js"></script>
     <script src="assets/js/color.js"></script>
