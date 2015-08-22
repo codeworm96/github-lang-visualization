@@ -10,4 +10,20 @@ function github_data_convert(table) {
     }
   }
 }
-    
+
+function pypl_data_convert(table) {
+    var i;
+    for (i = 0; i < table[0].length; ++i){
+        table[0][i] = table[0][i].toLowerCase();
+    }
+}
+
+function merge(arr1, arr2) {
+    var res = arr1.slice();
+    arr2.forEach(function (x) {
+        if(res.every(function(y) { return y !== x; })){
+            res.push(x);
+        }
+    });
+    return res;
+}

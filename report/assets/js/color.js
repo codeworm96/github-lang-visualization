@@ -15,7 +15,10 @@ var color_scheme = {
   "html": "#e44b23",
   "r": "#198ce7",
   "swift": "#ffac45",
-  "lua": "#000080"
+  "lua": "#000080",
+  "matlab": "#cb1b45",
+  "visual basic": "#91ad70",
+  "vba": "#91b493"
 };
 
 function color(name){

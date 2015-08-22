@@ -12,7 +12,12 @@ def fetch_pypl
   }
   res = res.map(&:chomp)
   File.open("report/data/pypl.js", "w") do |f|
-    res.each { |line| f.puts line }
+    res.each do |line|
+      line.gsub!(/new Date\((\d*),1,31\)/, '"\1-01-31"')
+      line.gsub!(/new Date\((\d*),5,31\)/, '"\1-05-31"')
+      line.gsub!(/new Date\((\d*),9,31\)/, '"\1-09-30"')
+      f.puts line
+    end
   end
   puts "data saved to report/data/pypl.js"
 end
@@ -60,9 +65,9 @@ def fetch_github(client, date, lang, star = 0)
   res.first.zip(*res.drop(1))
 end
 
-def save_to_file(res, name)
+def save_to_file(res, name, var_name)
   File.open(name, "w") do |f|
-    f.puts(JSON.generate(res))
+    f.puts(var_name + "=" + JSON.generate(res) + ";")
   end
 end
 
@@ -72,6 +77,6 @@ config = JSON.parse(buf)
 
 client = Octokit::Client.new(:access_token => config["token"])
 config["stars"].each do |star|
-  save_to_file(fetch_github(client, config["date"], config["language"], star), "report/data/star#{star}.json")
+  save_to_file(fetch_github(client, config["date"], config["language"], star), "report/data/star#{star}.js", "star#{star}")
 end
 

@@ -39,9 +39,6 @@ function Pie(cur, table, width, height) {
       .each(function(d) {
         this._current = d;
       });
-  g.append('text')
-    .attr('transform', function (d) { return 'translate(' + arc.centroid(d) + ')'; })
-    .style('text-anchor', 'middle');
   
   g.on('mousemove', function (d) {
     d3.select('.tooltip')
@@ -55,7 +52,7 @@ function Pie(cur, table, width, height) {
       .style('display', 'none');
   });
 
-  this.render = function (date) {
+  this.render = function (date)  {
     this.node.selectAll('.arc')
       .data(pie(this.data[date]))
       .select('g path')
@@ -98,10 +95,3 @@ function create_timeline(node, dates, charts) {
 
   focus(dates[dates.length - 1]);
 }
-
-
-      
-
-
-
-

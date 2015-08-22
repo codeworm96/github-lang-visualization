@@ -1,6 +1,7 @@
 .directory
 /config.json
 *.swp
+/report/.idea/*
 /data/*
 /vendor/bundle/*
 Gemfile.lock

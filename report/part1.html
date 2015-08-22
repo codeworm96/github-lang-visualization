@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Github language distribution</title>
+    <title>语言分布随时间变化图</title>
     <meta charset="utf-8">
     <style type="text/css">
       .axis path,
@@ -22,7 +22,7 @@
     <div id="graph"></div>
     <ul id="legend"></ul>
     <p>鼠标悬停在图例或曲线上以突出显示某语言。</p>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="assets/js/d3.min.js"></script>
     <script src="assets/js/util.js"></script>
     <script src="assets/js/color.js"></script>
     <script src="data/star0.js"></script>
@@ -30,7 +30,7 @@
       function format(table) {
         var title = table[0];
         var res = {};
-        var i;
+        var i, j;
         for (i = 0; i < title.length; ++i){
           res[title[i]] = [];
           for (j = 1; j < table.length; ++j){
