@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Github 统计与 PYPL 对比</title>
+    <meta charset="utf-8">
+    <style type="text/css">
+    </style>
+    <link rel="stylesheet" type="text/css" href="assets/css/common.css">
+  </head>
+  <body>
+    <h1>Github 统计与 PYPL 对比</h1>
+    <ol id="time-line"></ol>
+    <div class="tooltip"></div>
+    <div class="pie-chart" id="star0"><h2 class="title">Github</h2></div>
+    <div class="pie-chart" id="pypl"><h2 class="title">PYPL</h2></div>
+    <ul id="legend"></ul>
+    <p>在时间轴上滑动以观察随时间的变化，悬停于扇形上以查看详细信息。</p>
+    <script src="assets/js/d3.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/color.js"></script>
+    <script src="data/star0.js"></script>
+    <script src="data/pypl.js"></script>
+    <script src="assets/js/pie.js"></script>
+    <script type="text/javascript">
+      
+      var charts = [];
+      github_data_convert(star0);
+      charts.push(new Pie(d3.select('#star0'), star0, 300, 300));
+      pypl_data_convert(graphData);
+      charts.push(new Pie(d3.select('#pypl'), graphData, 300, 300));
+
+      var languages = merge(star0[0].slice(1), graphData[0].slice(1));
+      var dates = [];
+      for (var i = 1; i < star0.length; ++i){
+        dates.push(star0[i][0]);
+      }
+      
+      create_timeline(d3.select('#time-line'), dates, charts);
+
+      labels = d3.select('#legend')
+        .selectAll('li')
+        .data(languages)
+        .enter()
+        .append('li');
+
+      labels.append('span')
+        .attr('class', 'language-color')
+        .style('background-color', function (d) { return color(d); });
+      labels.append('span')
+        .text(function (d) { return d; });
+
+    </script>
+  </body>
+<html>
