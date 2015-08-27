@@ -6,13 +6,17 @@ require 'octokit'
 
 def fetch_pypl
   puts "fetching PYPL data"
+  #download data
   res = [];
   open("http://pypl.github.io/PYPL/All.js") { |f|
     res = f.readlines
   }
+  
+  #save data
   res = res.map(&:chomp)
   File.open("report/data/pypl.js", "w") do |f|
     res.each do |line|
+      #handle date format
       line.gsub!(/new Date\((\d*),1,31\)/, '"\1-01-31"')
       line.gsub!(/new Date\((\d*),5,31\)/, '"\1-05-31"')
       line.gsub!(/new Date\((\d*),9,31\)/, '"\1-09-30"')
@@ -28,10 +32,12 @@ def log(s)
   end
 end
 
+#method for count repo
 def repo_count(client, q)
   begin
     res = client.search_repositories q, :per_page => 1
   rescue Octokit::Error
+    #retry when fail
     puts "too fast"
     sleep 60
     retry
@@ -47,6 +53,7 @@ def fetch_github(client, date, lang, star = 0)
   res << ["Date"] + date[1..-1]
 
   lang.each do |l|
+    #feching raw data
     puts ">>>>language: #{l}"
     row = []
     date.each do |d|
@@ -56,6 +63,8 @@ def fetch_github(client, date, lang, star = 0)
       cnt = repo_count(client, query + " language:#{l}")
       row << cnt
     end
+
+    #calculate growth
     (1...row.size).each do |id|
       row[id] = row[id] - row[id - 1]
     end
@@ -67,11 +76,13 @@ end
 
 def save_to_file(res, name, var_name)
   File.open(name, "w") do |f|
-    f.puts(var_name + "=" + JSON.generate(res) + ";")
+    f.puts("var " + var_name + "=" + JSON.generate(res) + ";")
   end
 end
 
 fetch_pypl
+
+#github
 buf = File.read('config.json')
 config = JSON.parse(buf)
 
