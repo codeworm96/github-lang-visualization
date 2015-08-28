@@ -27,3 +27,21 @@ function merge(arr1, arr2) {
     });
     return res;
 }
+
+function load_json(config, kont) {
+  var complete_count = 0;
+  var data = {}
+  var callback_maker = function(name) {
+    return function(error, d) {
+      if (error) throw error;
+      data[name] = d;
+      complete_count++;
+      if(complete_count === config.length){
+        kont(data)
+      }
+    };
+  };
+  config.forEach(function(x) {
+    d3.json(x.file, callback_maker(x.name));
+  });
+}
