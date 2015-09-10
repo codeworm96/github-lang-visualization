@@ -15,6 +15,8 @@
     <div class="pie-chart" id="pypl"><h2 class="title">PYPL</h2></div>
     <ul id="legend"></ul>
     <p>在时间轴上滑动以观察随时间的变化，悬停于扇形上以查看详细信息。</p>
+    <a href="index.html">Back</a>
+    
     <script src="assets/js/d3.min.js"></script>
     <script src="assets/js/util.js"></script>
     <script src="assets/js/color.js"></script>
@@ -25,20 +27,22 @@
 d3.json('data/star0.json', function(error, star0) {
   if (error) throw error;
 
+  //creating charts
   var charts = [];
   github_data_convert(star0);
   charts.push(new Pie(d3.select('#star0'), star0, 300, 300));
   pypl_data_convert(graphData);
   charts.push(new Pie(d3.select('#pypl'), graphData, 300, 300));
 
-  var languages = merge(star0[0].slice(1), graphData[0].slice(1));
+  //create timeline
   var dates = [];
   for (var i = 1; i < star0.length; ++i){
     dates.push(star0[i][0]);
   }
-
   create_timeline(d3.select('#time-line'), dates, charts);
-
+  
+  //create legends
+  var languages = merge(star0[0].slice(1), graphData[0].slice(1));
   labels = d3.select('#legend')
     .selectAll('li')
     .data(languages)
