@@ -1,4 +1,7 @@
+//constructor for pie charts
 function Pie(cur, table, width, height) {
+
+  //zip language & share for d3.js
   function zip(lang, share) {
     var res = [];
     for (var i = 0; i < lang.length; ++i){
@@ -9,10 +12,12 @@ function Pie(cur, table, width, height) {
     }
     return res;
   }
+
   this.data = {};
   for (var i = 1; i < table.length; ++i){
     this.data[table[i][0]] = zip(table[0].slice(1), table[i].slice(1));
   }
+
   var radius = Math.min(width, height) / 2;
   var arc = d3.svg.arc()
     .outerRadius(radius - 10)
@@ -40,6 +45,7 @@ function Pie(cur, table, width, height) {
         this._current = d;
       });
   
+  //tooltip
   g.on('mousemove', function (d) {
     d3.select('.tooltip')
       .text(d.data.language + ': ' + (d.data.share * 100).toFixed(2) + '%')
@@ -52,7 +58,7 @@ function Pie(cur, table, width, height) {
       .style('display', 'none');
   });
 
-  this.render = function (date)  {
+  this.render = function (date) {
     this.node.selectAll('.arc')
       .data(pie(this.data[date]))
       .select('g path')
@@ -64,13 +70,17 @@ function Pie(cur, table, width, height) {
           _this._current = interpolate(t);
           return arc(_this._current);
         };
-
       });
   }
+
 }
 
+//create timeline for exploring data
 function create_timeline(node, dates, charts) {
+
+  //focus on certain date
   var focus = function (d) {
+    //change appearance
     items.each(function (data) {
       if (data === d){
         d3.select(this)
@@ -81,6 +91,7 @@ function create_timeline(node, dates, charts) {
       }
     });
 
+    //update charts
     charts.forEach(function(chart) {
       chart.render(d);
     });
@@ -93,5 +104,6 @@ function create_timeline(node, dates, charts) {
     .text(function (d) { return d.substr(0, 7); })
     .on('mouseover', focus);
 
+  //default date
   focus(dates[dates.length - 1]);
 }

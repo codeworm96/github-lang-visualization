@@ -22,10 +22,14 @@
     <div id="graph"></div>
     <ul id="legend"></ul>
     <p>鼠标悬停在图例或曲线上以突出显示某语言。</p>
+    <a href="index.html">Back</a>
+    
     <script src="assets/js/d3.min.js"></script>
     <script src="assets/js/util.js"></script>
     <script src="assets/js/color.js"></script>
     <script type="text/javascript">
+
+//format data for line charts
 function format(table) {
   var title = table[0];
   var res = {};
@@ -40,9 +44,14 @@ function format(table) {
   res.language = title;
   return res;
 }
+
+//prepare data for d3.js
 function prepare_for_d3(stat) {
   var res = [];
+  
+  //converting dates
   stat['Date'] = stat['Date'].map(parseDate);
+  
   stat['language'].forEach(function (lang) {
     var val = [];
     for (var i = 0; i < stat['Date'].length; ++i){
@@ -58,6 +67,8 @@ function prepare_for_d3(stat) {
   });
   return res;
 }
+
+//focus on certain language
 function focus(name){
   d3.selectAll('.lang path')
     .style('stroke', function(d) {
@@ -76,13 +87,14 @@ function focus(name){
   });
 }
 
+//remove focus effect
 function recover(){
   d3.selectAll('.lang path')
     .style('stroke', function(d) { return color(d.name); })
     .style('opacity', 1);
 }
 
-
+//d3 settings
 var margin = { top:20, right:20, bottom:30, left:50 };
 var width = 960 - margin.left - margin.right;
 var height = 500 - margin.top - margin.bottom;
@@ -94,35 +106,38 @@ var x = d3.time.scale()
 var y = d3.scale.linear()
   .range([height, 0]);
 
-  var xAxis = d3.svg.axis()
-.scale(x)
+var xAxis = d3.svg.axis()
+  .scale(x)
   .orient('bottom');
 
-  var yAxis = d3.svg.axis()
-.scale(y)
+var yAxis = d3.svg.axis()
+  .scale(y)
   .orient('left');
 
 var line = d3.svg.line()
   .interpolate('basis')
   .x(function(d) { return x(d.date); })
   .y(function(d) { return y(d.share); });
-  d3.json('data/star0.json', function(error, star0) {
-    if (error) throw error;
+  
 
-    var languages = star0[0].slice(1);
-    github_data_convert(star0);
-    var stat = format(star0);
-    data = prepare_for_d3(stat);
+//load json and draw chart
+d3.json('data/star0.json', function(error, star0) {
+  if (error) throw error;
 
-    x.domain([
-        d3.min(data, function(d) { return d3.min(d.value, function(v) { return v.date; }); }),
-        d3.max(data, function(d) { return d3.max(d.value, function(v) { return v.date; }); })
-    ]);
+  var languages = star0[0].slice(1);
+  github_data_convert(star0);
+  var stat = format(star0);
+  data = prepare_for_d3(stat);
 
-    y.domain([
-        d3.min(data, function(d) { return d3.min(d.value, function(v) { return v.share; }); }),
-        d3.max(data, function(d) { return d3.max(d.value, function(v) { return v.share; }); })
-    ]);
+  x.domain([
+    d3.min(data, function(d) { return d3.min(d.value, function(v) { return v.date; }); }),
+    d3.max(data, function(d) { return d3.max(d.value, function(v) { return v.date; }); })
+  ]);
+
+  y.domain([
+    d3.min(data, function(d) { return d3.min(d.value, function(v) { return v.share; }); }),
+    d3.max(data, function(d) { return d3.max(d.value, function(v) { return v.share; }); })
+  ]);
 
     var svg = d3.select('#graph')
       .append('svg')
@@ -131,48 +146,47 @@ var line = d3.svg.line()
       .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-          svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(xAxis);
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
 
-          svg.append("g")
-          .attr("class", "y axis")
-          .call(yAxis)
-          .append("text")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .text("Percent");
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Share (%)");
 
-          var lang = svg.selectAll(".lang")
-          .data(data)
-          .enter()
-          .append('g')
-          .attr('class', 'lang');
+    var lang = svg.selectAll(".lang")
+      .data(data)
+      .enter()
+      .append('g')
+      .attr('class', 'lang');
 
-          lang.append('path')
-            .attr('class', function(d) { return 'line ' + d.name; })
-            .attr('title', function(d) { return d.name; })
-            .attr('d', function(d) { return line(d.value); })
-            .style('stroke', function (d) { return color(d.name); })
-            .on('mouseover', function (d) { focus(d.name); })
-            .on('mouseleave', recover);
+    lang.append('path')
+      .attr('class', function(d) { return 'line ' + d.name; })
+      .attr('d', function(d) { return line(d.value); })
+      .style('stroke', function (d) { return color(d.name); })
+      .on('mouseover', function (d) { focus(d.name); })
+      .on('mouseleave', recover);
 
-          labels = d3.select('#legend')
-            .selectAll('li')
-            .data(languages)
-            .enter()
-            .append('li')
-            .on('mouseover', function (d) { focus(d); })
-            .on('mouseleave', recover);
+    labels = d3.select('#legend')
+      .selectAll('li')
+      .data(languages)
+      .enter()
+      .append('li')
+      .on('mouseover', function (d) { focus(d); })
+      .on('mouseleave', recover);
 
-          labels.append('span')
-            .attr('class', 'language-color')
-            .style('background-color', function (d) { return color(d); });
-          labels.append('span')
-            .text(function (d) { return d; });
+    labels.append('span')
+      .attr('class', 'language-color')
+      .style('background-color', function (d) { return color(d); });
+    labels.append('span')
+       .text(function (d) { return d; });
   });
     </script>
   </body>

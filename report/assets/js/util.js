@@ -1,3 +1,4 @@
+//compute shares
 function github_data_convert(table) {
   var i, j, total;
   for (i = 1; i < table.length; ++i){
@@ -18,6 +19,7 @@ function pypl_data_convert(table) {
     }
 }
 
+//merge two arrays as sets
 function merge(arr1, arr2) {
     var res = arr1.slice();
     arr2.forEach(function (x) {
@@ -28,12 +30,15 @@ function merge(arr1, arr2) {
     return res;
 }
 
+//helper for loading json files
+//kont: continuation
 function load_json(config, kont) {
   var complete_count = 0;
   var data = {}
   var callback_maker = function(name) {
     return function(error, d) {
       if (error) throw error;
+
       data[name] = d;
       complete_count++;
       if(complete_count === config.length){
@@ -41,6 +46,7 @@ function load_json(config, kont) {
       }
     };
   };
+
   config.forEach(function(x) {
     d3.json(x.file, callback_maker(x.name));
   });

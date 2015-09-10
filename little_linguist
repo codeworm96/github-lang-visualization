@@ -4,32 +4,46 @@ require 'open-uri'
 require 'json'
 require 'octokit'
 
+#module for logging
+module Log
+
+  def self.info(msg)
+    puts '[INFO] ' + msg
+  end
+
+  def self.fail(msg)
+    puts '[FAIL] ' + msg
+  end
+
+end
+
+#fetch results of PYPL
 def fetch_pypl
-  puts "fetching PYPL data"
+  Log.info "fetching PYPL data..."
+
   #download data
   res = [];
   open("http://pypl.github.io/PYPL/All.js") { |f|
     res = f.readlines
   }
   
-  #save data
+  #remove newline characters
   res = res.map(&:chomp)
+
+  #save data
   File.open("report/data/pypl.js", "w") do |f|
     res.each do |line|
+
       #handle date format
       line.gsub!(/new Date\((\d*),1,31\)/, '"\1-01-31"')
       line.gsub!(/new Date\((\d*),5,31\)/, '"\1-05-31"')
       line.gsub!(/new Date\((\d*),9,31\)/, '"\1-09-30"')
+
       f.puts line
     end
   end
-  puts "data saved to report/data/pypl.js"
-end
 
-def log(s)
-  File.open('log','a') do |f|
-    f.puts s
-  end
+  Log.info "PYPL data saved to report/data/pypl.js"
 end
 
 #method for count repo
@@ -38,12 +52,14 @@ def repo_count(client, q)
     res = client.search_repositories q, :per_page => 1
   rescue Octokit::Error
     #retry when fail
-    puts "too fast"
+    Log.info "Querying is too fast. The script will sleep for 1 minute and try again."
     sleep 60
     retry
   end
+
+  #verify results
   if res[:incomplete_results]
-    log('failed ' + q)
+    Log.fail "incomplete result for " + q
   end
   res[:total_count]
 end
@@ -54,12 +70,15 @@ def fetch_github(client, date, lang, star = 0)
 
   lang.each do |l|
     #feching raw data
-    puts ">>>>language: #{l}"
+    Log.info "fetching language: #{l}"
     row = []
     date.each do |d|
-      puts "fetching #{d}..."
+      Log.info ">>>> fetching #{d}..."
+
+      #building query
       query = "created:<#{d}" 
       query += " stars:>=#{star}" if star > 0
+
       cnt = repo_count(client, query + " language:#{l}")
       row << cnt
     end
@@ -69,25 +88,29 @@ def fetch_github(client, date, lang, star = 0)
       row[id] = row[id] - row[id - 1]
     end
     row[0] = l
+
     res << row
   end
+
+  #formating result
   res.first.zip(*res.drop(1))
 end
 
-def save_to_file(res, name, var_name)
+def save_to_file(res, name)
   File.open(name, "w") do |f|
-    f.puts("var " + var_name + "=" + JSON.generate(res) + ";")
+    f.puts JSON.generate(res)
   end
 end
 
 fetch_pypl
 
-#github
+#loading config
 buf = File.read('config.json')
 config = JSON.parse(buf)
 
+#fetch github
 client = Octokit::Client.new(:access_token => config["token"])
 config["stars"].each do |star|
-  save_to_file(fetch_github(client, config["date"], config["language"], star), "report/data/star#{star}.js", "star#{star}")
+  save_to_file(fetch_github(client, config["date"], config["language"], star), "report/data/star#{star}.json")
 end
 

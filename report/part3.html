@@ -17,11 +17,14 @@
     <div class="pie-chart" id="star1000"><h2 class="title">stars >= 1000</h2></div>
     <ul id="legend"></ul>
     <p>在时间轴上滑动以观察随时间的变化，悬停于扇形上以查看详细信息。</p>
+    <a href="index.html">Back</a>
+    
     <script src="assets/js/d3.min.js"></script>
     <script src="assets/js/util.js"></script>
     <script src="assets/js/color.js"></script>
     <script src="assets/js/pie.js"></script>
     <script type="text/javascript">
+//config of json to load
 config = [
   {file: 'data/star0.json', name: 'star0'},
   {file: 'data/star10.json', name: 'star10'},
@@ -35,11 +38,7 @@ load_json(config, function(d) {
   var star100 = d.star100;
   var star1000 = d.star1000;
 
-  var languages = star0[0].slice(1);
-  var dates = [];
-  for (var i = 1; i < star0.length; ++i){
-    dates.push(star0[i][0]);
-  }
+  //create charts
   var charts = [];
   github_data_convert(star0);
   charts.push(new Pie(d3.select('#star0'), star0, 300, 300));
@@ -50,8 +49,15 @@ load_json(config, function(d) {
   github_data_convert(star1000);
   charts.push(new Pie(d3.select('#star1000'), star1000, 300, 300));
 
+  //create timeline
+  var dates = [];
+  for (var i = 1; i < star0.length; ++i){
+    dates.push(star0[i][0]);
+  }
   create_timeline(d3.select('#time-line'), dates, charts);
 
+  //create legend
+  var languages = star0[0].slice(1);
   labels = d3.select('#legend')
     .selectAll('li')
     .data(languages)

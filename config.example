@@ -1,5 +1,5 @@
 {
-  "token":"<your token>",
+  "token":"<your github token>",
     "language":["javascript",
     "python",
     "java",
