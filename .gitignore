@@ -1,5 +1,5 @@
+config.json
 .directory
-/config.json
 *.swp
 /report/.idea/*
 /data/*
