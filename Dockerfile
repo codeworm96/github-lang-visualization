@@ -15,4 +15,5 @@ RUN bundle install
 
 EXPOSE 4567
 
-CMD ["bundle", "exec", "./little_linguist_serve"]
+CMD ["bundle", "exec", "./little_linguist_serve", "-o", "0.0.0.0"]
+
